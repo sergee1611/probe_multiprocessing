@@ -1,11 +1,10 @@
-from multiprocessing import Lock, Pool
-from time import sleep
-
-lock = Lock()
+from multiprocessing import Manager, Pool
 
 
 class WarehouseManager:
-    data = {}
+    def __init__(self):
+        managers = Manager()
+        self.data = managers.dict()
 
     def process_request(self, request):
         if request[0] in self.data:
@@ -15,12 +14,20 @@ class WarehouseManager:
                 self.data[request[0]] -= request[2]
         elif request[0] not in self.data and request[1] == "receipt":
             self.data[request[0]] = request[2]
-        return self.data
+        # for i in request:
+        #     product, action, quantity = i
+        #     if action == "receipt":
+        #         if product in self.data:
+        #             self.data[product] += quantity
+        #         else:
+        #             self.data[product] = quantity
+        #     elif action == "shipment":
+        #         if product in self.data and self.data[product] > quantity:
+        #             self.data[product] -= quantity
 
     def run(self, requests):
-        with Pool(processes=4) as pool:
+        with Pool(processes=2) as pool:
             pool.map(self.process_request, requests)
-
 
 
 if __name__ == '__main__':
