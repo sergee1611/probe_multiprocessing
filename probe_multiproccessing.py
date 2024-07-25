@@ -7,13 +7,14 @@ class WarehouseManager:
         self.data = managers.dict()
 
     def process_request(self, request):
-        if request[0] in self.data:
-            if request[1] == "receipt":
+        if request[1] == "receipt":
+            if request[0] in self.data:
                 self.data[request[0]] += request[2]
-            elif request[1] == "shipment" and self.data[request[0]] > 0:
+            else:
+                self.data[request[0]] = request[2]
+        elif request[1] == "shipment":
+            if request[0] in self.data and self.data[request[0]] >= request[2]:
                 self.data[request[0]] -= request[2]
-        elif request[0] not in self.data and request[1] == "receipt":
-            self.data[request[0]] = request[2]
         # for i in request:
         #     product, action, quantity = i
         #     if action == "receipt":
